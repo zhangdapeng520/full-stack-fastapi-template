@@ -46,9 +46,23 @@ services:
       - default
 
   db:
-    restart: "no"
-    ports:
-      - "5432:5432"
+    image: postgres:17
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
 
   adminer:
     restart: "no"
@@ -56,35 +70,26 @@ services:
       - "8080:8080"
 
   backend:
-    restart: "no"
-    ports:
-      - "8000:8000"
     build:
       context: ./backend
-    # command: sleep infinity  # Infinite loop to keep container alive doing nothing
-    command:
-      - fastapi
-      - run
-      - --reload
-      - "app/main.py"
-    develop:
-      watch:
-        - path: ./backend
-          action: sync
-          target: /app
-          ignore:
-            - ./backend/.venv
-            - .venv
-        - path: ./backend/pyproject.toml
-          action: rebuild
-    # TODO: remove once coverage is done locally
-    volumes:
-      - ./backend/htmlcov:/app/htmlcov
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
     environment:
-      SMTP_HOST: "mailcatcher"
-      SMTP_PORT: "1025"
-      SMTP_TLS: "false"
-      EMAILS_FROM_EMAIL: "noreply@example.com"
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: bash -c "python app/backend_pre_start.py && alembic upgrade head && python app/initial_data.py && fastapi run --workers 4 app/main.py --host 0.0.0.0 --port 8000"
 
   mailcatcher:
     image: schickling/mailcatcher
@@ -93,14 +98,16 @@ services:
       - "1025:1025"
 
   frontend:
-    restart: "no"
-    ports:
-      - "5173:80"
     build:
       context: ./frontend
+      dockerfile: Dockerfile
       args:
         - VITE_API_URL=http://localhost:8000
-        - NODE_ENV=development
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
 
   playwright:
     build:
@@ -126,6 +133,9 @@ services:
       - ./frontend/test-results:/app/test-results
     ports:
       - 9323:9323
+
+volumes:
+  app-db-data:
 
 networks:
   traefik-public:
