@@ -4,110 +4,133 @@ from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
 
-# Shared properties
+# 用户相关模型
+
+# 用户基础属性
 class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True, index=True, max_length=255)
-    is_active: bool = True
-    is_superuser: bool = False
-    full_name: str | None = Field(default=None, max_length=255)
+    """用户基础模型，包含用户的基本信息"""
+    email: EmailStr = Field(unique=True, index=True, max_length=255)  # 邮箱，唯一且建立索引
+    is_active: bool = True  # 是否激活
+    is_superuser: bool = False  # 是否为超级用户
+    full_name: str | None = Field(default=None, max_length=255)  # 全名
 
 
-# Properties to receive via API on creation
+# 创建用户时通过API接收的属性
 class UserCreate(UserBase):
-    password: str = Field(min_length=8, max_length=40)
+    """用户创建模型，包含密码字段"""
+    password: str = Field(min_length=8, max_length=40)  # 密码，长度8-40位
 
 
 class UserRegister(SQLModel):
-    email: EmailStr = Field(max_length=255)
-    password: str = Field(min_length=8, max_length=40)
-    full_name: str | None = Field(default=None, max_length=255)
+    """用户注册模型"""
+    email: EmailStr = Field(max_length=255)  # 邮箱
+    password: str = Field(min_length=8, max_length=40)  # 密码
+    full_name: str | None = Field(default=None, max_length=255)  # 全名
 
 
-# Properties to receive via API on update, all are optional
+# 更新用户时通过API接收的属性，所有字段都是可选的
 class UserUpdate(UserBase):
+    """用户更新模型，所有字段可选"""
     email: EmailStr | None = Field(default=None, max_length=255)  # type: ignore
     password: str | None = Field(default=None, min_length=8, max_length=40)
 
 
 class UserUpdateMe(SQLModel):
-    full_name: str | None = Field(default=None, max_length=255)
-    email: EmailStr | None = Field(default=None, max_length=255)
+    """用户自我更新模型"""
+    full_name: str | None = Field(default=None, max_length=255)  # 全名
+    email: EmailStr | None = Field(default=None, max_length=255)  # 邮箱
 
 
 class UpdatePassword(SQLModel):
-    current_password: str = Field(min_length=8, max_length=40)
-    new_password: str = Field(min_length=8, max_length=40)
+    """密码更新模型"""
+    current_password: str = Field(min_length=8, max_length=40)  # 当前密码
+    new_password: str = Field(min_length=8, max_length=40)  # 新密码
 
 
-# Database model, database table inferred from class name
+# 数据库模型，数据库表名从类名推断
 class User(UserBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    """用户数据库模型"""
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)  # 用户ID，主键
+    hashed_password: str  # 哈希密码
+    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)  # 用户拥有的项目，级联删除
 
 
-# Properties to return via API, id is always required
+# 通过API返回的属性，id始终必需
 class UserPublic(UserBase):
-    id: uuid.UUID
+    """用户公开信息模型"""
+    id: uuid.UUID  # 用户ID
 
 
 class UsersPublic(SQLModel):
-    data: list[UserPublic]
-    count: int
+    """用户列表公开信息模型"""
+    data: list[UserPublic]  # 用户列表
+    count: int  # 用户总数
 
 
-# Shared properties
+# 项目相关模型
+
+# 项目基础属性
 class ItemBase(SQLModel):
-    title: str = Field(min_length=1, max_length=255)
-    description: str | None = Field(default=None, max_length=255)
+    """项目基础模型"""
+    title: str = Field(min_length=1, max_length=255)  # 标题，长度1-255位
+    description: str | None = Field(default=None, max_length=255)  # 描述，可选
 
 
-# Properties to receive on item creation
+# 创建项目时接收的属性
 class ItemCreate(ItemBase):
+    """项目创建模型"""
     pass
 
 
-# Properties to receive on item update
+# 更新项目时接收的属性
 class ItemUpdate(ItemBase):
+    """项目更新模型"""
     title: str | None = Field(default=None, min_length=1, max_length=255)  # type: ignore
 
 
-# Database model, database table inferred from class name
+# 数据库模型，数据库表名从类名推断
 class Item(ItemBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    """项目数据库模型"""
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)  # 项目ID，主键
     owner_id: uuid.UUID = Field(
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
-    )
-    owner: User | None = Relationship(back_populates="items")
+    )  # 所有者ID，外键关联用户表
+    owner: User | None = Relationship(back_populates="items")  # 所有者关系
 
 
-# Properties to return via API, id is always required
+# 通过API返回的属性，id始终必需
 class ItemPublic(ItemBase):
-    id: uuid.UUID
-    owner_id: uuid.UUID
+    """项目公开信息模型"""
+    id: uuid.UUID  # 项目ID
+    owner_id: uuid.UUID  # 所有者ID
 
 
 class ItemsPublic(SQLModel):
-    data: list[ItemPublic]
-    count: int
+    """项目列表公开信息模型"""
+    data: list[ItemPublic]  # 项目列表
+    count: int  # 项目总数
 
 
-# Generic message
+# 通用消息模型
 class Message(SQLModel):
-    message: str
+    """通用消息模型"""
+    message: str  # 消息内容
 
 
-# JSON payload containing access token
+# 包含访问令牌的JSON载荷
 class Token(SQLModel):
-    access_token: str
-    token_type: str = "bearer"
+    """令牌模型"""
+    access_token: str  # 访问令牌
+    token_type: str = "bearer"  # 令牌类型
 
 
-# Contents of JWT token
+# JWT令牌内容
 class TokenPayload(SQLModel):
-    sub: str | None = None
+    """令牌载荷模型"""
+    sub: str | None = None  # 主题（通常是用户ID）
 
 
 class NewPassword(SQLModel):
-    token: str
-    new_password: str = Field(min_length=8, max_length=40)
+    """新密码模型"""
+    token: str  # 重置令牌
+    new_password: str = Field(min_length=8, max_length=40)  # 新密码
