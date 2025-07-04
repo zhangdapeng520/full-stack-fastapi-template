@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
+import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { type UserCreate, UsersService } from "@/client"
 import type { ApiError } from "@/client/core/ApiError"
@@ -13,6 +15,10 @@ import {
   Input,
   Text,
   VStack,
+  Box,
+  FormControl,
+  FormLabel,
+  Heading,
 } from "@chakra-ui/react"
 import { useState } from "react"
 import { FaPlus } from "react-icons/fa"
@@ -32,7 +38,8 @@ interface UserCreateForm extends UserCreate {
   confirm_password: string
 }
 
-const AddUser = () => {
+const AddUser: React.FC = () => {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast } = useCustomToast()
@@ -86,24 +93,24 @@ const AddUser = () => {
       <DialogTrigger asChild>
         <Button value="add-user" my={4}>
           <FaPlus fontSize="16px" />
-          Add User
+          {t('Add User')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Add User</DialogTitle>
+            <DialogTitle>{t('Add User')}</DialogTitle>
           </DialogHeader>
           <DialogBody>
             <Text mb={4}>
-              Fill in the form below to add a new user to the system.
+              {t('Fill in the form below to add a new user to the system.')}
             </Text>
             <VStack gap={4}>
               <Field
                 required
                 invalid={!!errors.email}
                 errorText={errors.email?.message}
-                label="Email"
+                label={t('Email')}
               >
                 <Input
                   id="email"
@@ -119,7 +126,7 @@ const AddUser = () => {
               <Field
                 invalid={!!errors.full_name}
                 errorText={errors.full_name?.message}
-                label="Full Name"
+                label={t('Full Name')}
               >
                 <Input
                   id="name"
@@ -133,7 +140,7 @@ const AddUser = () => {
                 required
                 invalid={!!errors.password}
                 errorText={errors.password?.message}
-                label="Set Password"
+                label={t('Set Password')}
               >
                 <Input
                   id="password"
@@ -153,7 +160,7 @@ const AddUser = () => {
                 required
                 invalid={!!errors.confirm_password}
                 errorText={errors.confirm_password?.message}
-                label="Confirm Password"
+                label={t('Confirm Password')}
               >
                 <Input
                   id="confirm_password"
@@ -179,7 +186,7 @@ const AddUser = () => {
                       checked={field.value}
                       onCheckedChange={({ checked }) => field.onChange(checked)}
                     >
-                      Is superuser?
+                      {t('Is superuser?')}
                     </Checkbox>
                   </Field>
                 )}
@@ -193,7 +200,7 @@ const AddUser = () => {
                       checked={field.value}
                       onCheckedChange={({ checked }) => field.onChange(checked)}
                     >
-                      Is active?
+                      {t('Is active?')}
                     </Checkbox>
                   </Field>
                 )}
@@ -208,7 +215,7 @@ const AddUser = () => {
                 colorPalette="gray"
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('Cancel')}
               </Button>
             </DialogActionTrigger>
             <Button
@@ -217,7 +224,7 @@ const AddUser = () => {
               disabled={!isValid}
               loading={isSubmitting}
             >
-              Save
+              {t('Save')}
             </Button>
           </DialogFooter>
         </form>

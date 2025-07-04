@@ -1,8 +1,10 @@
+import React from 'react';
 import { Button, DialogTitle, Text } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { FiTrash2 } from "react-icons/fi"
+import { useTranslation } from 'react-i18next';
 
 import { ItemsService } from "@/client"
 import {
@@ -17,7 +19,7 @@ import {
 } from "@/components/ui/dialog"
 import useCustomToast from "@/hooks/useCustomToast"
 
-const DeleteItem = ({ id }: { id: string }) => {
+const DeleteItem: React.FC<{ id: string }> = ({ id }) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast, showErrorToast } = useCustomToast()
@@ -25,6 +27,7 @@ const DeleteItem = ({ id }: { id: string }) => {
     handleSubmit,
     formState: { isSubmitting },
   } = useForm()
+  const { t } = useTranslation();
 
   const deleteItem = async (id: string) => {
     await ItemsService.deleteItem({ id: id })
@@ -59,7 +62,7 @@ const DeleteItem = ({ id }: { id: string }) => {
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" colorPalette="red">
           <FiTrash2 fontSize="16px" />
-          Delete Item
+          {t('Delete Item')}
         </Button>
       </DialogTrigger>
 
@@ -67,13 +70,10 @@ const DeleteItem = ({ id }: { id: string }) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogCloseTrigger />
           <DialogHeader>
-            <DialogTitle>Delete Item</DialogTitle>
+            <DialogTitle>{t('Delete Item')}</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <Text mb={4}>
-              This item will be permanently deleted. Are you sure? You will not
-              be able to undo this action.
-            </Text>
+            <Text mb={4}>{t('Are you sure you want to delete this item?')}</Text>
           </DialogBody>
 
           <DialogFooter gap={2}>
@@ -83,7 +83,7 @@ const DeleteItem = ({ id }: { id: string }) => {
                 colorPalette="gray"
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('Cancel')}
               </Button>
             </DialogActionTrigger>
             <Button
@@ -92,7 +92,7 @@ const DeleteItem = ({ id }: { id: string }) => {
               type="submit"
               loading={isSubmitting}
             >
-              Delete
+              {t('Delete')}
             </Button>
           </DialogFooter>
         </form>

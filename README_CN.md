@@ -15,13 +15,11 @@
     - 🤖 自动生成的前端客户端
     - 🧪 [Playwright](https://playwright.dev) - 端到端测试
     - 🦇 暗色模式支持
-- 🐋 [Docker Compose](https://www.docker.com) - 开发和部署容器化
+- 🐋 [Docker](https://www.docker.com) - 容器化部署
 - 🔒 默认安全的密码哈希
 - 🔑 JWT（JSON Web Token）身份认证
 - 📫 基于邮件的密码重置
 - ✅ 使用 [Pytest](https://pytest.org) 进行测试
-- 📞 [Traefik](https://traefik.io) - 反向代理/负载均衡器
-- 🚢 使用 Docker Compose 的部署说明，包括如何设置前端 Traefik 代理来处理自动 HTTPS 证书
 - 🏭 基于 GitHub Actions 的 CI（持续集成）和 CD（持续部署）
 
 ### 仪表板登录界面
@@ -66,16 +64,30 @@ git clone <your-repo-url>
 cd full-stack-fastapi-template
 ```
 
-2. **使用优化后的启动脚本**
-```bash
-# Windows
-start-local.bat
+2. **启动 PostgreSQL 数据库**
+```powershell
+# Windows PowerShell
+.\scripts\start_postgres.ps1
 
-# Linux/Mac
-./start-local.sh
+# 或者手动启动
+docker run -d --name app-postgres --network app-network -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=changethis -e POSTGRES_DB=app -v app-postgres-data:/var/lib/postgresql/data --restart always postgres:17
 ```
 
-3. **访问服务**
+3. **启动后端服务**
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+4. **启动前端服务**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+5. **访问服务**
 - 前端: http://localhost:5173
 - 后端API: http://localhost:8000
 - API文档: http://localhost:8000/docs
@@ -230,20 +242,21 @@ Copier 会询问您一些数据，您可能希望在生成项目之前准备好�
 - 前端使用阿里云 npm 镜像源
 - 加速依赖下载和构建过程
 
-### 📦 简化的启动配置
-- 创建了 `docker-compose.local.yml` 用于本地开发
-- 提供了 `start-local.sh` 和 `start-local.bat` 启动脚本
-- 移除了复杂的 Traefik 配置，专注于核心功能
+### 📦 简化的部署配置
+- 移除了复杂的 Docker Compose 配置
+- 提供了独立的 PostgreSQL 启动脚本
+- 专注于核心功能，简化部署流程
 
-### 🔧 依赖管理优化
-- 使用 `requirements.txt` 替代 `uv` 进行依赖管理
-- 补充了所有必需的依赖包
-- 修复了启动命令，使用 `uvicorn` 替代 `fastapi CLI`
+### 🔧 数据库管理脚本
+- `scripts/start_postgres.ps1` - 启动 PostgreSQL 容器
+- `scripts/stop_postgres.ps1` - 停止 PostgreSQL 容器
+- `scripts/clean_postgres.ps1` - 清理容器和数据卷
 
 ### 🎯 快速开始
-1. 运行启动脚本
-2. 访问 http://localhost:8000/docs 查看API文档
-3. 开始您的开发工作
+1. 运行 PostgreSQL 启动脚本
+2. 启动后端和前端服务
+3. 访问 http://localhost:8000/docs 查看API文档
+4. 开始您的开发工作
 
 ## 项目结构
 
@@ -261,9 +274,11 @@ full-stack-fastapi-template/
 │   ├── src/              # 源代码
 │   ├── Dockerfile        # 前端Docker配置
 │   └── package.json      # Node.js依赖
-├── docker-compose.local.yml  # 本地开发配置
-├── start-local.sh        # Linux/Mac启动脚本
-└── start-local.bat       # Windows启动脚本
+├── scripts/               # 脚本文件
+│   ├── start_postgres.ps1 # PostgreSQL启动脚本
+│   ├── stop_postgres.ps1  # PostgreSQL停止脚本
+│   └── clean_postgres.ps1 # PostgreSQL清理脚本
+└── .env                   # 环境配置文件
 ```
 
 ## 贡献

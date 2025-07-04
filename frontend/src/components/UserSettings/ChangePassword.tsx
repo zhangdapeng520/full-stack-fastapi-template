@@ -1,7 +1,9 @@
-import { Box, Button, Container, Heading, VStack } from "@chakra-ui/react"
+import React from 'react';
+import { Box, Button, Container, Heading, VStack, FormControl, FormLabel, Input } from "@chakra-ui/react"
 import { useMutation } from "@tanstack/react-query"
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { FiLock } from "react-icons/fi"
+import { useTranslation } from 'react-i18next';
 
 import { type ApiError, type UpdatePassword, UsersService } from "@/client"
 import useCustomToast from "@/hooks/useCustomToast"
@@ -12,7 +14,8 @@ interface UpdatePasswordForm extends UpdatePassword {
   confirm_password: string
 }
 
-const ChangePassword = () => {
+const ChangePassword: React.FC = () => {
+  const { t } = useTranslation();
   const { showSuccessToast } = useCustomToast()
   const {
     register,
@@ -42,47 +45,53 @@ const ChangePassword = () => {
   }
 
   return (
-    <>
-      <Container maxW="full">
-        <Heading size="sm" py={4}>
-          Change Password
-        </Heading>
-        <Box as="form" onSubmit={handleSubmit(onSubmit)}>
-          <VStack gap={4} w={{ base: "100%", md: "sm" }}>
+    <Box p={6} boxShadow="md" borderRadius="md">
+      <Heading mb={4}>{t('Change Password')}</Heading>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <VStack gap={4} w={{ base: "100%", md: "sm" }}>
+          <FormControl mb={4}>
+            <FormLabel>{t('Current Password')}</FormLabel>
             <PasswordInput
               type="current_password"
               startElement={<FiLock />}
               {...register("current_password", passwordRules())}
-              placeholder="Current Password"
+              placeholder={t('Current Password')}
               errors={errors}
             />
+          </FormControl>
+          <FormControl mb={4}>
+            <FormLabel>{t('New Password')}</FormLabel>
             <PasswordInput
               type="new_password"
               startElement={<FiLock />}
               {...register("new_password", passwordRules())}
-              placeholder="New Password"
+              placeholder={t('New Password')}
               errors={errors}
             />
+          </FormControl>
+          <FormControl mb={4}>
+            <FormLabel>{t('Confirm Password')}</FormLabel>
             <PasswordInput
               type="confirm_password"
               startElement={<FiLock />}
               {...register("confirm_password", confirmPasswordRules(getValues))}
-              placeholder="Confirm Password"
+              placeholder={t('Confirm Password')}
               errors={errors}
             />
-          </VStack>
-          <Button
-            variant="solid"
-            mt={4}
-            type="submit"
-            loading={isSubmitting}
-            disabled={!isValid}
-          >
-            Save
-          </Button>
-        </Box>
-      </Container>
-    </>
+          </FormControl>
+        </VStack>
+        <Button
+          variant="solid"
+          mt={4}
+          type="submit"
+          loading={isSubmitting}
+          disabled={!isValid}
+        >
+          {t('Submit')}
+        </Button>
+      </form>
+    </Box>
   )
 }
+
 export default ChangePassword

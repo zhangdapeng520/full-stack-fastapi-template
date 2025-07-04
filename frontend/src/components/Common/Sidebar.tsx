@@ -1,8 +1,11 @@
-import { Box, Flex, IconButton, Text } from "@chakra-ui/react"
+import React from "react"
+import { Box, Flex, IconButton, Text, VStack, Link as ChakraLink } from "@chakra-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { FaBars } from "react-icons/fa"
 import { FiLogOut } from "react-icons/fi"
+import { Link } from "@tanstack/react-router"
+import { useTranslation } from 'react-i18next'
 
 import type { UserPublic } from "@/client"
 import useAuth from "@/hooks/useAuth"
@@ -21,6 +24,7 @@ const Sidebar = () => {
   const currentUser = queryClient.getQueryData<UserPublic>(["currentUser"])
   const { logout } = useAuth()
   const [open, setOpen] = useState(false)
+  const { t } = useTranslation()
 
   return (
     <>
@@ -87,7 +91,17 @@ const Sidebar = () => {
         p={4}
       >
         <Box w="100%">
-          <SidebarItems />
+          <VStack align="stretch" spacing={4}>
+            <ChakraLink as={Link} to="/" fontWeight="bold">
+              {t('Dashboard')}
+            </ChakraLink>
+            <ChakraLink as={Link} to="/items">
+              {t('Items')}
+            </ChakraLink>
+            <ChakraLink as={Link} to="/settings">
+              {t('Settings')}
+            </ChakraLink>
+          </VStack>
         </Box>
       </Box>
     </>

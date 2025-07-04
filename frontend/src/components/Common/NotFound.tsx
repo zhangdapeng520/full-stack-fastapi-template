@@ -1,57 +1,24 @@
-import { Button, Center, Flex, Text } from "@chakra-ui/react"
-import { Link } from "@tanstack/react-router"
+import React from 'react';
+import { Box, Heading, Text, Button } from '@chakra-ui/react';
+import { Link } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 
-const NotFound = () => {
+const NotFound: React.FC = () => {
+  const { t } = useTranslation();
   return (
-    <>
-      <Flex
-        height="100vh"
-        align="center"
-        justify="center"
-        flexDir="column"
-        data-testid="not-found"
-        p={4}
-      >
-        <Flex alignItems="center" zIndex={1}>
-          <Flex flexDir="column" ml={4} align="center" justify="center" p={4}>
-            <Text
-              fontSize={{ base: "6xl", md: "8xl" }}
-              fontWeight="bold"
-              lineHeight="1"
-              mb={4}
-            >
-              404
-            </Text>
-            <Text fontSize="2xl" fontWeight="bold" mb={2}>
-              Oops!
-            </Text>
-          </Flex>
-        </Flex>
+    <Box textAlign="center" py={10} px={6}>
+      <Heading display="inline-block" as="h2" size="2xl" bgGradient="linear(to-r, teal.400, teal.600)" backgroundClip="text">
+        404
+      </Heading>
+      <Text fontSize="18px" mt={3} mb={2}>{t('Not Found')}</Text>
+      <Text color={'gray.500'} mb={6}>
+        {t('The page you are looking for does not seem to exist.')}
+      </Text>
+      <Button as={Link} to="/" colorScheme="teal" variant="solid">
+        {t('Go to Home')}
+      </Button>
+    </Box>
+  );
+};
 
-        <Text
-          fontSize="lg"
-          color="gray.600"
-          mb={4}
-          textAlign="center"
-          zIndex={1}
-        >
-          The page you are looking for was not found.
-        </Text>
-        <Center zIndex={1}>
-          <Link to="/">
-            <Button
-              variant="solid"
-              colorScheme="teal"
-              mt={4}
-              alignSelf="center"
-            >
-              Go Back
-            </Button>
-          </Link>
-        </Center>
-      </Flex>
-    </>
-  )
-}
-
-export default NotFound
+export default NotFound;

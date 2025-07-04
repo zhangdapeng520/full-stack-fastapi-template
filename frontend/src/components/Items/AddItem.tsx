@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { type SubmitHandler, useForm } from "react-hook-form"
+import React from 'react'
 
 import {
   Button,
@@ -8,15 +9,6 @@ import {
   Input,
   Text,
   VStack,
-} from "@chakra-ui/react"
-import { useState } from "react"
-import { FaPlus } from "react-icons/fa"
-
-import { type ItemCreate, ItemsService } from "@/client"
-import type { ApiError } from "@/client/core/ApiError"
-import useCustomToast from "@/hooks/useCustomToast"
-import { handleError } from "@/utils"
-import {
   DialogBody,
   DialogCloseTrigger,
   DialogContent,
@@ -24,10 +16,21 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTrigger,
-} from "../ui/dialog"
+  FormControl,
+  FormLabel,
+  Heading,
+} from "@chakra-ui/react"
+import { useState } from "react"
+import { FaPlus } from "react-icons/fa"
+import { useTranslation } from 'react-i18next'
+
+import { type ItemCreate, ItemsService } from "@/client"
+import type { ApiError } from "@/client/core/ApiError"
+import useCustomToast from "@/hooks/useCustomToast"
+import { handleError } from "@/utils"
 import { Field } from "../ui/field"
 
-const AddItem = () => {
+const AddItem: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast } = useCustomToast()
@@ -44,6 +47,7 @@ const AddItem = () => {
       description: "",
     },
   })
+  const { t } = useTranslation()
 
   const mutation = useMutation({
     mutationFn: (data: ItemCreate) =>
@@ -75,29 +79,29 @@ const AddItem = () => {
       <DialogTrigger asChild>
         <Button value="add-item" my={4}>
           <FaPlus fontSize="16px" />
-          Add Item
+          {t('Add Item')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
-            <DialogTitle>Add Item</DialogTitle>
+            <DialogTitle>{t('Add Item')}</DialogTitle>
           </DialogHeader>
           <DialogBody>
-            <Text mb={4}>Fill in the details to add a new item.</Text>
+            <Text mb={4}>{t('Fill in the details to add a new item.')}</Text>
             <VStack gap={4}>
               <Field
                 required
                 invalid={!!errors.title}
                 errorText={errors.title?.message}
-                label="Title"
+                label={t('Title')}
               >
                 <Input
                   id="title"
                   {...register("title", {
                     required: "Title is required.",
                   })}
-                  placeholder="Title"
+                  placeholder={t('Title')}
                   type="text"
                 />
               </Field>
@@ -105,12 +109,12 @@ const AddItem = () => {
               <Field
                 invalid={!!errors.description}
                 errorText={errors.description?.message}
-                label="Description"
+                label={t('Description')}
               >
                 <Input
                   id="description"
                   {...register("description")}
-                  placeholder="Description"
+                  placeholder={t('Description')}
                   type="text"
                 />
               </Field>
@@ -124,7 +128,7 @@ const AddItem = () => {
                 colorPalette="gray"
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('Cancel')}
               </Button>
             </DialogActionTrigger>
             <Button
@@ -133,7 +137,7 @@ const AddItem = () => {
               disabled={!isValid}
               loading={isSubmitting}
             >
-              Save
+              {t('Save')}
             </Button>
           </DialogFooter>
         </form>

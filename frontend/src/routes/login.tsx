@@ -6,6 +6,8 @@ import {
 } from "@tanstack/react-router"
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { FiLock, FiMail } from "react-icons/fi"
+import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { Body_login_login_access_token as AccessToken } from "@/client"
 import { Button } from "@/components/ui/button"
@@ -41,6 +43,7 @@ function Login() {
       password: "",
     },
   })
+  const { t } = useTranslation()
 
   const onSubmit: SubmitHandler<AccessToken> = async (data) => {
     if (isSubmitting) return
@@ -85,7 +88,7 @@ function Login() {
                 required: "Username is required",
                 pattern: emailPattern,
               })}
-              placeholder="Email"
+              placeholder={t('Username')}
               type="email"
             />
           </InputGroup>
@@ -94,19 +97,19 @@ function Login() {
           type="password"
           startElement={<FiLock />}
           {...register("password", passwordRules())}
-          placeholder="Password"
+          placeholder={t('Password')}
           errors={errors}
         />
         <RouterLink to="/recover-password" className="main-link">
-          Forgot Password?
+          {t('Forgot Password?')}
         </RouterLink>
         <Button variant="solid" type="submit" loading={isSubmitting} size="md">
-          Log In
+          {t('Submit')}
         </Button>
         <Text>
-          Don't have an account?{" "}
+          {t('Don\'t have an account?')}
           <RouterLink to="/signup" className="main-link">
-            Sign Up
+            {t('Sign Up')}
           </RouterLink>
         </Text>
       </Container>

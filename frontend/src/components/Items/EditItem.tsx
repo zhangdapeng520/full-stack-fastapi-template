@@ -5,11 +5,16 @@ import {
   Input,
   Text,
   VStack,
+  Box,
+  FormControl,
+  FormLabel,
+  Heading,
 } from "@chakra-ui/react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { type SubmitHandler, useForm } from "react-hook-form"
 import { FaExchangeAlt } from "react-icons/fa"
+import { useTranslation } from 'react-i18next'
 
 import { type ApiError, type ItemPublic, ItemsService } from "@/client"
 import useCustomToast from "@/hooks/useCustomToast"
@@ -39,6 +44,7 @@ const EditItem = ({ item }: EditItemProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const queryClient = useQueryClient()
   const { showSuccessToast } = useCustomToast()
+  const { t } = useTranslation()
   const {
     register,
     handleSubmit,
@@ -87,61 +93,47 @@ const EditItem = ({ item }: EditItemProps) => {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <Text mb={4}>Update the item details below.</Text>
-            <VStack gap={4}>
-              <Field
-                required
-                invalid={!!errors.title}
-                errorText={errors.title?.message}
-                label="Title"
-              >
-                <Input
-                  id="title"
-                  {...register("title", {
-                    required: "Title is required",
-                  })}
-                  placeholder="Title"
-                  type="text"
-                />
-              </Field>
-
-              <Field
-                invalid={!!errors.description}
-                errorText={errors.description?.message}
-                label="Description"
-              >
-                <Input
-                  id="description"
-                  {...register("description")}
-                  placeholder="Description"
-                  type="text"
-                />
-              </Field>
-            </VStack>
-          </DialogBody>
-
-          <DialogFooter gap={2}>
-            <ButtonGroup>
-              <DialogActionTrigger asChild>
-                <Button
-                  variant="subtle"
-                  colorPalette="gray"
-                  disabled={isSubmitting}
-                >
-                  Cancel
+        <Box p={6} boxShadow="md" borderRadius="md">
+          <Heading mb={4}>{t('Edit Item')}</Heading>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FormControl mb={4}>
+              <FormLabel>{t('Title')}</FormLabel>
+              <Input
+                id="title"
+                {...register("title", {
+                  required: "Title is required",
+                })}
+                placeholder="Title"
+                type="text"
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>{t('Description')}</FormLabel>
+              <Input
+                id="description"
+                {...register("description")}
+                placeholder="Description"
+                type="text"
+              />
+            </FormControl>
+            <DialogFooter gap={2}>
+              <ButtonGroup>
+                <DialogActionTrigger asChild>
+                  <Button
+                    variant="subtle"
+                    colorPalette="gray"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                </DialogActionTrigger>
+                <Button variant="solid" type="submit" loading={isSubmitting}>
+                  {t('Submit')}
                 </Button>
-              </DialogActionTrigger>
-              <Button variant="solid" type="submit" loading={isSubmitting}>
-                Save
-              </Button>
-            </ButtonGroup>
-          </DialogFooter>
-        </form>
+              </ButtonGroup>
+            </DialogFooter>
+          </form>
+        </Box>
         <DialogCloseTrigger />
       </DialogContent>
     </DialogRoot>

@@ -8,8 +8,10 @@
 full-stack-fastapi-template/
 ├── backend/                 # 后端代码目录
 ├── frontend/               # 前端代码目录
-├── docker-compose.yml      # Docker Compose 配置
-├── docker-compose.local.yml # 本地开发配置
+├── scripts/                # 脚本文件
+│   ├── start_postgres.ps1  # PostgreSQL启动脚本
+│   ├── stop_postgres.ps1   # PostgreSQL停止脚本
+│   └── clean_postgres.ps1  # PostgreSQL清理脚本
 ├── start-local.sh          # Linux/Mac 启动脚本
 ├── start-local.bat         # Windows 启动脚本
 └── README_CN.md           # 中文说明文档
@@ -171,9 +173,9 @@ CREATE TABLE item (
 ## 部署配置
 
 ### Docker Compose
-- **docker-compose.yml**: 生产环境配置
-- **docker-compose.local.yml**: 本地开发配置
-- **docker-compose.override.yml**: 开发环境覆盖配置
+- **scripts/start_postgres.ps1**: PostgreSQL 启动脚本
+- **scripts/stop_postgres.ps1**: PostgreSQL 停止脚本
+- **scripts/clean_postgres.ps1**: PostgreSQL 清理脚本
 
 ### 环境变量
 - **.env**: 环境变量配置
