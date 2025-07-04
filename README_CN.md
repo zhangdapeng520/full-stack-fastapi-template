@@ -270,6 +270,10 @@ full-stack-fastapi-template/
 
 欢迎提交 Issue 和 Pull Request！
 
+根据配置文件，您可以使用以下默认账户登录：
+邮箱: admin@example.com
+密码: changethis
+
 ## 许可证
 
 本项目采用 MIT 许可证。 
